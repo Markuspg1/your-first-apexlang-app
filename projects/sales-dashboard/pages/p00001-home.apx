@@ -159,6 +159,73 @@ page 1 (
         }
     )
 
+    region kpi-cards (
+        name: Key Metrics
+        type: cards
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                WITH by_region AS (SELECT region, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY region),
+                     by_month  AS (SELECT TO_CHAR(sale_date, 'YYYY-MM') AS mth, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY TO_CHAR(sale_date, 'YYYY-MM')),
+                     tot       AS (SELECT SUM(amount) AS total, COUNT(*) AS cnt FROM sales)
+                SELECT 1 AS kpi, TO_CHAR(t.total, 'FML999G999G990D00') AS title, 'Total Revenue' AS subtitle,
+                       t.cnt || ' sales across ' || (SELECT COUNT(*) FROM by_region) || ' regions' AS body, 'fa fa-money' AS icon,
+                       'By region — ' || (SELECT LISTAGG(region || ': ' || TO_CHAR(total, 'FML999G999G990D00'), '   |   ') WITHIN GROUP (ORDER BY total DESC) FROM by_region) AS detail
+                FROM tot t
+                UNION ALL SELECT 2, TO_CHAR(t.cnt), 'Transactions',
+                       'from ' || TO_CHAR((SELECT MIN(sale_date) FROM sales), 'Mon YYYY') || ' to ' || TO_CHAR((SELECT MAX(sale_date) FROM sales), 'Mon YYYY'), 'fa fa-shopping-cart',
+                       'By region — ' || (SELECT LISTAGG(region || ': ' || cnt, '   |   ') WITHIN GROUP (ORDER BY cnt DESC, region) FROM by_region)
+                FROM tot t
+                UNION ALL SELECT 3, TO_CHAR(ROUND(AVG(amount), 2), 'FML999G999G990D00'), 'Average Ticket', 'per transaction', 'fa fa-line-chart',
+                       'Min ' || TO_CHAR(MIN(amount), 'FML999G990D00') || '   |   Median ' || TO_CHAR(MEDIAN(amount), 'FML999G990D00') || '   |   Max ' || TO_CHAR(MAX(amount), 'FML999G990D00')
+                FROM sales
+                UNION ALL SELECT 4, r.region, 'Top Region', TO_CHAR(r.total, 'FML999G999G990D00') || ' revenue', 'fa fa-trophy',
+                       r.region || ' = ' || TO_CHAR(ROUND(100 * r.total / (SELECT total FROM tot), 1)) || '% of revenue over ' || r.cnt || ' sales, avg ' || TO_CHAR(ROUND(r.total / r.cnt, 2), 'FML999G990D00')
+                FROM (SELECT * FROM by_region ORDER BY total DESC FETCH FIRST 1 ROW ONLY) r
+                UNION ALL SELECT 5, m.mth, 'Best Month', TO_CHAR(m.total, 'FML999G999G990D00') || ' revenue', 'fa fa-calendar',
+                       m.cnt || ' sales in ' || m.mth || ', avg ' || TO_CHAR(ROUND(m.total / m.cnt, 2), 'FML999G990D00') || '   |   ' || TO_CHAR(ROUND(100 * m.total / (SELECT total FROM tot), 1)) || '% of total'
+                FROM (SELECT * FROM by_month ORDER BY total DESC FETCH FIRST 1 ROW ONLY) m
+                UNION ALL SELECT 6, TO_CHAR(b.amount, 'FML999G999G990D00'), 'Largest Sale', b.region || ', ' || TO_CHAR(b.sale_date, 'DD Mon YYYY'), 'fa fa-star',
+                       'Sale #' || b.id || ' — ' || b.region || ' on ' || TO_CHAR(b.sale_date, 'DD Mon YYYY') || '   |   ' || TO_CHAR(ROUND(100 * b.amount / (SELECT total FROM tot), 1)) || '% of total revenue'
+                FROM (SELECT * FROM sales ORDER BY amount DESC FETCH FIRST 1 ROW ONLY) b
+                ORDER BY 1
+            ```
+        }
+        layout {
+            sequence: 12
+            slot: body
+        }
+        appearance {
+            template: @/cards-container
+            templateOptions: #DEFAULT#
+        }
+        card {
+            primaryKeyColumn1: KPI
+        }
+        title {
+            advancedFormatting: true
+            htmlExpression: <span title="&DETAIL." style="cursor: help">&TITLE.</span>
+        }
+        subtitle {
+            advancedFormatting: false
+            column: SUBTITLE
+        }
+        body {
+            advancedFormatting: true
+            htmlExpression: <span title="&DETAIL." style="cursor: help">&BODY.</span>
+        }
+        iconAndBadge {
+            iconSource: iconClassColumn
+            iconColumn: ICON
+            iconPosition: start
+        }
+        componentAppearance {
+            layout: grid
+            gridColumns: 3
+        }
+    )
+
     region monthly-summary (
         name: Monthly Summary
         type: interactiveReport

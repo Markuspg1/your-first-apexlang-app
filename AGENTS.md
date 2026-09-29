@@ -278,6 +278,16 @@ Straight from Oracle's `templates/page-examples/interactive-grid/interactive-gri
 - a page-level `process save-sales ( type: interactiveGridAutoRowProcessing  editableRegion: @sales-editor  execution { sequence: 10 } )` does the DML.
 - **Correction:** Oracle's example puts `enableUsersTo { sort: false }` on the hidden PK column; the compiler rejects it (`Invalid property: sort`). Drop it.
 
+### Cards region (KPI tiles) — working pattern
+
+From Oracle's `templates/region-components/cards/cards.standard.md`; live on `pages/p00001-home.apx` (`kpi-cards`). One SQL row = one card:
+
+- `type: cards`, `appearance { template: @/cards-container }`, `card { primaryKeyColumn1: KPI }`, `title|subtitle|body { advancedFormatting: false  column: X }`, `componentAppearance { layout: grid  gridColumns: 3 }` (2–5 only with `layout: grid`).
+- Icons: `iconAndBadge { iconSource: iconClassColumn  iconColumn: ICON  iconPosition: start }` and the column value **must carry the `fa ` prefix** (`'fa fa-money'`). Without it every card shows the same placeholder glyph. Font APEX names that exist: fa-money, fa-shopping-cart, fa-line-chart, fa-trophy, fa-calendar, fa-star.
+- Hover detail: there is no tooltip attribute, so put a `DETAIL` column in the SQL and use `title { advancedFormatting: true  htmlExpression: <span title="&DETAIL." style="cursor: help">&TITLE.</span> }` (same for `body`). Column substitutions inside Cards HTML expressions are `&COL.`.
+- Cards render client-side from JSON, so `curl` of the page never shows card content; verify with a headless screenshot (icons, values) and trust the HTML expression for the tooltip.
+- SQL can be as rich as you like (CTEs, LISTAGG, FETCH FIRST) — run it once directly as the parsing schema before importing.
+
 ### Administration pages from the APEX dictionary
 
 Read-only IRs over `apex_workspace_apex_users`, `apex_applications`, `apex_application_pages`, `apex_workspace_activity_log` work fine from the app's parsing schema. Scope them without hard-coding names: `WHERE application_id = :APP_ID`, `WHERE workspace_id = (SELECT workspace_id FROM apex_applications WHERE application_id = :APP_ID)`. Bind variables in region SQL are fine. See `pages/p00003-admin.apx`.
