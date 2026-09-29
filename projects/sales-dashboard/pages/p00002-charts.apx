@@ -29,6 +29,171 @@ page 2 (
         }
     )
 
+    region kpi-strip (
+        name: At a Glance
+        type: themeTemplateComponent/metricCard
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                WITH by_region AS (SELECT region, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY region),
+                     by_month  AS (SELECT TO_CHAR(sale_date, 'YYYY-MM') AS mth, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY TO_CHAR(sale_date, 'YYYY-MM')),
+                     tot       AS (SELECT SUM(amount) AS total, COUNT(*) AS cnt, ROUND(AVG(amount), 2) AS avg_amt FROM sales),
+                     lm        AS (SELECT mth, total, cnt, LAG(total) OVER (ORDER BY mth) AS prev_total, LAG(cnt) OVER (ORDER BY mth) AS prev_cnt FROM by_month ORDER BY mth DESC FETCH FIRST 1 ROW ONLY),
+                     top       AS (SELECT region, total, cnt FROM by_region ORDER BY total DESC FETCH FIRST 1 ROW ONLY)
+                SELECT 1 AS seq, 'Total Revenue' AS label, TO_CHAR(t.total, 'FML999G999G990D00') AS metric, t.cnt || ' sales across ' || (SELECT COUNT(*) FROM by_region) || ' regions' AS meta, 'fa-money' AS icon,
+                       'Trend' AS badge_label, TO_CHAR(ROUND(100 * (l.total - l.prev_total) / NULLIF(l.prev_total, 0))) || '% vs prior month' AS badge_value,
+                       CASE WHEN l.total >= l.prev_total THEN 'success' ELSE 'danger' END AS badge_state
+                FROM tot t CROSS JOIN lm l
+                UNION ALL SELECT 2, 'Transactions', TO_CHAR(t.cnt), 'Jan – Jul 2026', 'fa-shopping-cart',
+                       'Trend', TO_CHAR(l.cnt - l.prev_cnt, 'S9990') || ' vs prior month',
+                       CASE WHEN l.cnt >= l.prev_cnt THEN 'success' ELSE 'warning' END
+                FROM tot t CROSS JOIN lm l
+                UNION ALL SELECT 3, 'Average Ticket', TO_CHAR(t.avg_amt, 'FML999G999G990D00'), 'per transaction', 'fa-line-chart',
+                       'Trend', TO_CHAR(ROUND(l.total / l.cnt, 2), 'FML999G990D00') || ' last month',
+                       CASE WHEN l.total / l.cnt >= t.avg_amt THEN 'success' ELSE 'info' END
+                FROM tot t CROSS JOIN lm l
+                UNION ALL SELECT 4, 'Top Region', r.region, TO_CHAR(r.total, 'FML999G999G990D00') || ' over ' || r.cnt || ' sales', 'fa-trophy',
+                       'Trend', TO_CHAR(ROUND(100 * r.total / t.total, 1)) || '% of revenue', 'success'
+                FROM top r CROSS JOIN tot t
+                ORDER BY 1
+            ```
+        }
+        layout {
+            sequence: 7
+            slot: body
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        componentAppearance {
+            display: report
+        }
+        settings {
+            title: &LABEL.
+            metric: &METRIC.
+            meta: &META.
+            layout: 2Columns
+        }
+        plugin-avatar {
+            displayAvatar: true
+            type: icon
+            icon: &ICON.
+            position: inline
+            alignment: start
+            shape: circular
+            size: small
+            style: subtle
+        }
+        plugin-badge {
+            displayBadge: true
+            label: Trend
+            value: BADGE_VALUE
+            state: BADGE_STATE
+            style: subtle
+            shape: rounded
+            size: medium
+            displayLabel: false
+        }
+        column SEQ (
+            layout {
+                sequence: 10
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: SEQ
+                dataType: number
+            }
+        )
+        column LABEL (
+            layout {
+                sequence: 20
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: LABEL
+                dataType: varchar2
+            }
+        )
+        column METRIC (
+            layout {
+                sequence: 30
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: METRIC
+                dataType: varchar2
+            }
+        )
+        column META (
+            layout {
+                sequence: 40
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: META
+                dataType: varchar2
+            }
+        )
+        column ICON (
+            layout {
+                sequence: 50
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: ICON
+                dataType: varchar2
+            }
+        )
+        column BADGE_LABEL (
+            layout {
+                sequence: 60
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: BADGE_LABEL
+                dataType: varchar2
+            }
+        )
+        column BADGE_VALUE (
+            layout {
+                sequence: 70
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: BADGE_VALUE
+                dataType: varchar2
+            }
+        )
+        column BADGE_STATE (
+            layout {
+                sequence: 80
+            }
+            appearance {
+                group: false
+            }
+            source {
+                databaseColumn: BADGE_STATE
+                dataType: varchar2
+            }
+        )
+    )
+
     region revenue-share-pie (
         name: Revenue Share by Region
         type: chart

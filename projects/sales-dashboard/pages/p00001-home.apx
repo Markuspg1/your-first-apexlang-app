@@ -168,26 +168,34 @@ page 1 (
             sqlQuery: ```sql
                 WITH by_region AS (SELECT region, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY region),
                      by_month  AS (SELECT TO_CHAR(sale_date, 'YYYY-MM') AS mth, SUM(amount) AS total, COUNT(*) AS cnt FROM sales GROUP BY TO_CHAR(sale_date, 'YYYY-MM')),
-                     tot       AS (SELECT SUM(amount) AS total, COUNT(*) AS cnt FROM sales)
+                     tot       AS (SELECT SUM(amount) AS total, COUNT(*) AS cnt, ROUND(AVG(amount), 2) AS avg_amt FROM sales),
+                     lm        AS (SELECT mth, total, cnt, LAG(total) OVER (ORDER BY mth) AS prev_total, LAG(cnt) OVER (ORDER BY mth) AS prev_cnt FROM by_month ORDER BY mth DESC FETCH FIRST 1 ROW ONLY),
+                     avgm      AS (SELECT ROUND(AVG(total), 2) AS avg_month FROM by_month)
                 SELECT 1 AS kpi, TO_CHAR(t.total, 'FML999G999G990D00') AS title, 'Total Revenue' AS subtitle,
                        t.cnt || ' sales across ' || (SELECT COUNT(*) FROM by_region) || ' regions' AS body, 'fa fa-money' AS icon,
-                       'By region — ' || (SELECT LISTAGG(region || ': ' || TO_CHAR(total, 'FML999G999G990D00'), '   |   ') WITHIN GROUP (ORDER BY total DESC) FROM by_region) AS detail
-                FROM tot t
+                       'By region — ' || (SELECT LISTAGG(region || ': ' || TO_CHAR(total, 'FML999G999G990D00'), '   |   ') WITHIN GROUP (ORDER BY total DESC) FROM by_region) AS detail,
+                       CASE WHEN l.total >= l.prev_total THEN 'up' ELSE 'down' END AS trend, TO_CHAR(ROUND(100 * (l.total - l.prev_total) / NULLIF(l.prev_total, 0))) || '% vs prior month' AS trend_text
+                FROM tot t CROSS JOIN lm l
                 UNION ALL SELECT 2, TO_CHAR(t.cnt), 'Transactions',
                        'from ' || TO_CHAR((SELECT MIN(sale_date) FROM sales), 'Mon YYYY') || ' to ' || TO_CHAR((SELECT MAX(sale_date) FROM sales), 'Mon YYYY'), 'fa fa-shopping-cart',
-                       'By region — ' || (SELECT LISTAGG(region || ': ' || cnt, '   |   ') WITHIN GROUP (ORDER BY cnt DESC, region) FROM by_region)
-                FROM tot t
+                       'By region — ' || (SELECT LISTAGG(region || ': ' || cnt, '   |   ') WITHIN GROUP (ORDER BY cnt DESC, region) FROM by_region),
+                       CASE WHEN l.cnt >= l.prev_cnt THEN 'up' ELSE 'down' END, TO_CHAR(l.cnt - l.prev_cnt, 'S9990') || ' vs prior month'
+                FROM tot t CROSS JOIN lm l
                 UNION ALL SELECT 3, TO_CHAR(ROUND(AVG(amount), 2), 'FML999G999G990D00'), 'Average Ticket', 'per transaction', 'fa fa-line-chart',
-                       'Min ' || TO_CHAR(MIN(amount), 'FML999G990D00') || '   |   Median ' || TO_CHAR(MEDIAN(amount), 'FML999G990D00') || '   |   Max ' || TO_CHAR(MAX(amount), 'FML999G990D00')
+                       'Min ' || TO_CHAR(MIN(amount), 'FML999G990D00') || '   |   Median ' || TO_CHAR(MEDIAN(amount), 'FML999G990D00') || '   |   Max ' || TO_CHAR(MAX(amount), 'FML999G990D00'),
+                       'flat', 'median ' || TO_CHAR(MEDIAN(amount), 'FML999G990D00')
                 FROM sales
                 UNION ALL SELECT 4, r.region, 'Top Region', TO_CHAR(r.total, 'FML999G999G990D00') || ' revenue', 'fa fa-trophy',
-                       r.region || ' = ' || TO_CHAR(ROUND(100 * r.total / (SELECT total FROM tot), 1)) || '% of revenue over ' || r.cnt || ' sales, avg ' || TO_CHAR(ROUND(r.total / r.cnt, 2), 'FML999G990D00')
+                       r.region || ' = ' || TO_CHAR(ROUND(100 * r.total / (SELECT total FROM tot), 1)) || '% of revenue over ' || r.cnt || ' sales, avg ' || TO_CHAR(ROUND(r.total / r.cnt, 2), 'FML999G990D00'),
+                       'up', TO_CHAR(ROUND(100 * r.total / (SELECT total FROM tot), 1)) || '% of revenue'
                 FROM (SELECT * FROM by_region ORDER BY total DESC FETCH FIRST 1 ROW ONLY) r
                 UNION ALL SELECT 5, m.mth, 'Best Month', TO_CHAR(m.total, 'FML999G999G990D00') || ' revenue', 'fa fa-calendar',
-                       m.cnt || ' sales in ' || m.mth || ', avg ' || TO_CHAR(ROUND(m.total / m.cnt, 2), 'FML999G990D00') || '   |   ' || TO_CHAR(ROUND(100 * m.total / (SELECT total FROM tot), 1)) || '% of total'
-                FROM (SELECT * FROM by_month ORDER BY total DESC FETCH FIRST 1 ROW ONLY) m
+                       m.cnt || ' sales in ' || m.mth || ', avg ' || TO_CHAR(ROUND(m.total / m.cnt, 2), 'FML999G990D00') || '   |   ' || TO_CHAR(ROUND(100 * m.total / (SELECT total FROM tot), 1)) || '% of total',
+                       'up', TO_CHAR(ROUND(100 * (m.total - a.avg_month) / a.avg_month)) || '% above avg month'
+                FROM (SELECT * FROM by_month ORDER BY total DESC FETCH FIRST 1 ROW ONLY) m CROSS JOIN avgm a
                 UNION ALL SELECT 6, TO_CHAR(b.amount, 'FML999G999G990D00'), 'Largest Sale', b.region || ', ' || TO_CHAR(b.sale_date, 'DD Mon YYYY'), 'fa fa-star',
-                       'Sale #' || b.id || ' — ' || b.region || ' on ' || TO_CHAR(b.sale_date, 'DD Mon YYYY') || '   |   ' || TO_CHAR(ROUND(100 * b.amount / (SELECT total FROM tot), 1)) || '% of total revenue'
+                       'Sale #' || b.id || ' — ' || b.region || ' on ' || TO_CHAR(b.sale_date, 'DD Mon YYYY') || '   |   ' || TO_CHAR(ROUND(100 * b.amount / (SELECT total FROM tot), 1)) || '% of total revenue',
+                       'up', TO_CHAR(ROUND(b.amount / (SELECT avg_amt FROM tot), 1)) || '× the average ticket'
                 FROM (SELECT * FROM sales ORDER BY amount DESC FETCH FIRST 1 ROW ONLY) b
                 ORDER BY 1
             ```
@@ -213,7 +221,7 @@ page 1 (
         }
         body {
             advancedFormatting: true
-            htmlExpression: <span title="&DETAIL." style="cursor: help">&BODY.</span>
+            htmlExpression: <span title="&DETAIL." style="cursor: help">&BODY.</span><br>{case TREND/}{when up/}<span class="u-success-text"><span class="fa fa-arrow-up" aria-hidden="true"></span> &TREND_TEXT.</span>{when down/}<span class="u-danger-text"><span class="fa fa-arrow-down" aria-hidden="true"></span> &TREND_TEXT.</span>{otherwise/}<span class="u-color-text"><span class="fa fa-minus" aria-hidden="true"></span> &TREND_TEXT.</span>{endcase/}
         }
         iconAndBadge {
             iconSource: iconClassColumn
