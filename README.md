@@ -93,7 +93,8 @@ ADB_DB_VERSION=19c             # 19c | 23ai | 26ai
 
 ```
 scripts/    idempotent bash: install → auth → provision → workspace → deploy
-projects/   APEXlang sample app (sales-dashboard) with a supporting-object install script
+projects/   APEXlang sample app (sales-dashboard): Cards + template directives, Metric Card template component,
+            5 JET charts, editable Interactive Grid, admin pages over the APEX dictionary, install script
 bridge.py   HTTP↔AppleScript bridge for the deck's Run buttons (macOS only)
 presentation.html   the deck itself — works offline, no CDN
 AGENTS.md   design notes + gotchas + APEXlang syntax discoveries

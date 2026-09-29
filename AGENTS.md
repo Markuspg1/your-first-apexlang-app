@@ -288,6 +288,27 @@ From Oracle's `templates/region-components/cards/cards.standard.md`; live on `pa
 - Cards render client-side from JSON, so `curl` of the page never shows card content; verify with a headless screenshot (icons, values) and trust the HTML expression for the tooltip.
 - SQL can be as rich as you like (CTEs, LISTAGG, FETCH FIRST) — run it once directly as the parsing schema before importing.
 
+### Template directives inside HTML expressions — working pattern
+
+APEX template directives (`{if COL/}…{endif/}`, `{if !COL/}`, `{case COL/}{when X/}…{otherwise/}{endcase/}`, `{loop/}`) work verbatim inside any `advancedFormatting: true  htmlExpression:` (Cards title/subtitle/body, IR column HTML expressions). Live on `p00001-home.apx` (`kpi-cards` body): the SQL projects `TREND` ∈ up|down|flat plus `TREND_TEXT`, and the expression branches:
+
+```
+htmlExpression: <span title="&DETAIL.">&BODY.</span><br>{case TREND/}{when up/}<span class="u-success-text"><span class="fa fa-arrow-up"></span> &TREND_TEXT.</span>{when down/}<span class="u-danger-text"><span class="fa fa-arrow-down"></span> &TREND_TEXT.</span>{otherwise/}<span class="u-color-text"><span class="fa fa-minus"></span> &TREND_TEXT.</span>{endcase/}
+```
+
+Keep the whole expression on ONE line (the property value ends at the newline). `{case/}` compares the raw column value, so emit lowercase tokens from SQL. `u-success-text` / `u-danger-text` / `u-warning-text` are Universal Theme utility classes — no CSS needed.
+
+### Template Components (Universal Theme Metric Card) — working pattern
+
+From Oracle's `templates/template-components/metric-card/metric-card.report-minimal.md` + `_common.md`; live on `p00002-charts.apx` (`kpi-strip`). One SQL row = one metric card:
+
+- `type: themeTemplateComponent/metricCard`, `appearance { template: @/blank-with-attributes }`, `componentAppearance { display: report }`, `settings { title: &LABEL.  metric: &METRIC.  meta: &META.  layout: 2Columns }` (`settings.metric` is required; layout tokens 2Columns|3Columns|4Columns|5Columns|autoWrapping|overflow|stacked).
+- `plugin-avatar { displayAvatar: true  type: icon  icon: &ICON.  position: inline  alignment: start  shape: circular  size: small  style: subtle }` — icon column values here are bare (`'fa-money'`, no `fa ` prefix — the opposite of the Cards region).
+- `plugin-badge { displayBadge: true  label: Trend  value: BADGE_VALUE  state: BADGE_STATE  style: subtle  shape: rounded  size: medium  displayLabel: false }`. `value` and `state` are **bare column aliases** (no `&…`); state values must be lowercase danger|warning|success|info. **`label` is rendered as a literal string** — `label: BADGE_LABEL` prints the text "BADGE_LABEL" even though Oracle's doc calls it source-backed. Per-row context therefore goes into the badge value (`'-85% vs prior month'`) with `displayLabel: false`.
+- Every projected column needs an explicit child: `column X ( layout { sequence }  appearance { group: false }  source { databaseColumn: X  dataType: varchar2|number } )` — lowercase data types like IG, not STRING/NUMBER like IR.
+- `4Columns` truncates title and metric with an ellipsis at 1400px when avatar + badge are on; `2Columns` fits everything.
+- Other Universal Theme template components exist under `templates/template-components/` (badge, avatar, comments, timeline, content-row, …) with the same `themeTemplateComponent/<name>` + `settings {}` + `plugin-*{}` shape.
+
 ### Administration pages from the APEX dictionary
 
 Read-only IRs over `apex_workspace_apex_users`, `apex_applications`, `apex_application_pages`, `apex_workspace_activity_log` work fine from the app's parsing schema. Scope them without hard-coding names: `WHERE application_id = :APP_ID`, `WHERE workspace_id = (SELECT workspace_id FROM apex_applications WHERE application_id = :APP_ID)`. Bind variables in region SQL are fine. See `pages/p00003-admin.apx`.
