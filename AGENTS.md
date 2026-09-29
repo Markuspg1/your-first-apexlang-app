@@ -116,7 +116,7 @@ supportingObject (
     advanced  { includeInAppExport: true }
 
     installScript sales-schema (
-        script    { content: @install-scripts/sales-schema.sql }
+        script    { contentFile: sales-schema.sql }
         execution { sequence: 10 }
     )
 )
@@ -303,7 +303,7 @@ What matters in the apexlang package:
 
 `apex generate -name … -dir ./projects` always writes to `./projects/starter-app/` and **overwrites every scaffold file** (application.apx back to the scaffold name, `deployments/default.json` emptied, auth back to APEX accounts, `p00001-home.apx` back to the hero-only page, `supporting-objects.apx` without the install script). It does not delete extra files, so a clobbered app looks half-alive. The slide-7 Run button does exactly this — that's how the authored app got wiped mid-session. Hence the split: `projects/sales-dashboard/` is the finished app and the only source of truth; `projects/starter-app/` is demo output and is git-ignored. `09-deploy-app.sh` defaults to `sales-dashboard`.
 
-If the source is ever lost again, the live app is the backup: `apex export -applicationid <id> -exptype APEXLANG -dir <dir>` round-trips cleanly (validated + re-imported). Oracle's exporter writes the install script as `supporting-objects/install-scripts.apx` with `script { contentFile: sales-schema.sql }` — that's the canonical form (the `content: @install-scripts/x.sql` spelling also imports). It omits default-valued groups (e.g. `chart { type: bar }`) and the `location: localDatabase` line.
+If the source is ever lost again, the live app is the backup: `apex export -applicationid <id> -exptype APEXLANG -dir <dir>` round-trips cleanly (validated + re-imported). Oracle's exporter writes the install script as `supporting-objects/install-scripts.apx` with `script { contentFile: sales-schema.sql }`. **That is the only correct form.** `script { content: @install-scripts/x.sql }` validates and imports, but the compiler stores the literal text `@install-scripts/x.sql` as the script body — the table is never created (`ORA-00942` in every report), and an export then writes that one-line stub back over your `.sql`. This bit the live demo. The exporter also omits default-valued groups (e.g. `chart { type: bar }`) and the `location: localDatabase` line.
 
 ### Safe way to test a risky change
 
