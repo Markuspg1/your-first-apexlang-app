@@ -83,6 +83,5 @@ info "running workspace bootstrap as ADMIN…"
 sql -cloudconfig "$WALLET" -S "admin/${ADMIN_PW}@webinar_medium" @"$TMP_SQL"
 
 ok "workspace ready"
-echo "  workspace   : WEBINAR"
-echo "  db schema   : WEBINAR"
-echo "  admin login : admin  /  $(cat "$ADMIN_WEB_PW_FILE")"
+echo
+bash "$(dirname "$0")/10-show-credentials.sh"

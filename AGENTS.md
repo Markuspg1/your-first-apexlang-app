@@ -43,8 +43,11 @@ webinar-apexlang-prep/
     ├── 06b-install-oracle-skills.sh  # github.com/oracle/skills → ~/.claude/skills (apexlang, db, oci); idempotent
     ├── 07-provision-adb.sh  # Always Free 19c ADB + wallet
     ├── 08-setup-workspace.sh# schema + workspace + admin user
-    └── 09-deploy-app.sh     # runs install SQL, validate + import + open URL
+    ├── 09-deploy-app.sh     # runs install SQL, validate + import + open URL, then prints the login block
+    └── 10-show-credentials.sh  # APEX Builder URL + workspace/ADMIN/password + DB creds, from the dot-files
 ```
+
+**Always hand the user the workspace login after provisioning.** `10-show-credentials.sh` prints it (and 08/09 call it automatically): Builder URL `<ords>/apex/`, workspace `WEBINAR`, user `ADMIN`, password from `.webinar-admin-web-password`. That password is regenerated every time 08 runs, so a stale value from earlier in the session is wrong — re-run the script rather than quoting from memory.
 
 ## The demo flow (what the audience sees)
 

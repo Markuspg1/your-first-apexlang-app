@@ -71,3 +71,6 @@ if command -v open >/dev/null 2>&1; then
   info "opening $APP_URL"
   open "$APP_URL"
 fi
+
+echo
+bash "$HERE/scripts/10-show-credentials.sh"

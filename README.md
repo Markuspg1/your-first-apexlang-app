@@ -40,7 +40,12 @@ bash scripts/08-setup-workspace.sh
 
 # 8: validate + import + open the deployed app
 bash scripts/09-deploy-app.sh
+
+# 9: print the APEX Builder login (URL / workspace WEBINAR / user ADMIN / password) — any time
+bash scripts/10-show-credentials.sh
 ```
+
+Steps 7 and 8 already end by printing that login block; the workspace ADMIN password is generated per run and kept in the git-ignored `.webinar-admin-web-password`.
 
 Total wall-clock time on a fresh Mac: **~15 minutes** (most of it downloading SQLcl, OCI CLI, and Java 21).
 

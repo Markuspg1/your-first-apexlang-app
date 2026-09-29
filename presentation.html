@@ -491,9 +491,11 @@
 <span class="p">$</span> <span class="c">bash scripts/08-setup-workspace.sh</span></span></div>
       <div class="line" data-run="bash scripts/09-deploy-app.sh"><span class="line-content"><span class="comment"># validate + apex import + print URL + open browser</span>
 <span class="p">$</span> <span class="c">bash scripts/09-deploy-app.sh</span></span></div>
+      <div class="line" data-run="bash scripts/10-show-credentials.sh"><span class="line-content"><span class="comment"># APEX Builder login (workspace / user / password) + app URL — any time, from the local dot-files</span>
+<span class="p">$</span> <span class="c">bash scripts/10-show-credentials.sh</span></span></div>
     </div>
     <div class="why">
-      Three idempotent scripts. Under a minute each once your ADB slot is warm.
+      Three idempotent scripts, plus one that prints the workspace login. Under a minute each once your ADB slot is warm.
       Each one prints <span class="good">✓</span> for what it skips and <span class="hi">→</span> for what it actually does — safe to re-run mid-demo if something goes sideways.
     </div>
   </section>
