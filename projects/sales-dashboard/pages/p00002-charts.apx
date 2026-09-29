@@ -1,0 +1,94 @@
+page 2 (
+    name: Charts
+    alias: CHARTS
+    title: Charts
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    security {
+        authentication: public
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region monthly-revenue-chart (
+        name: Monthly Revenue
+        type: chart
+        layout {
+            sequence: 20
+            slot: body
+            startNewRow: false
+            columnSpan: 6
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        chartLayout {
+            height: 400
+        }
+
+        series primary (
+            name: Revenue
+            execution {
+                sequence: 10
+            }
+            source {
+                type: sqlQuery
+                sqlQuery: "    SELECT TO_CHAR(sale_date,'YYYY-MM') AS label, SUM(amount) AS value FROM sales GROUP BY TO_CHAR(sale_date,'YYYY-MM') ORDER BY 1"
+            }
+            columnMapping {
+                label: LABEL
+                value: VALUE
+            }
+        )
+
+        axis x (
+            name: x
+        )
+
+        axis y (
+            name: y
+        )
+
+    )
+
+    region sales-by-region-chart (
+        name: Sales by Region
+        type: chart
+        layout {
+            sequence: 10
+            slot: body
+            columnSpan: 6
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        chart {
+            type: pie
+        }
+        chartLayout {
+            height: 400
+        }
+
+        series primary (
+            name: Total Sales
+            execution {
+                sequence: 10
+            }
+            source {
+                type: sqlQuery
+                sqlQuery: "    SELECT region AS label, SUM(amount) AS value FROM sales GROUP BY region ORDER BY 2 DESC"
+            }
+            columnMapping {
+                label: LABEL
+                value: VALUE
+            }
+        )
+
+    )
+
+)
+

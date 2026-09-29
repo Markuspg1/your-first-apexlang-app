@@ -1,0 +1,10 @@
+authentication no-auth (
+    name: No Authentication
+    type: noAuth
+)
+
+authentication oracle-apex-accounts (
+    name: Oracle APEX Accounts
+    type: oracleApexAccounts
+)
+

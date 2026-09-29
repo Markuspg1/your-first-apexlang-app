@@ -1,0 +1,9 @@
+installScript sales-schema (
+    execution {
+        sequence: 10
+    }
+    script {
+        contentFile: sales-schema.sql
+    }
+)
+

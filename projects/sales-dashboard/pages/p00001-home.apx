@@ -1,0 +1,434 @@
+page 1 (
+    name: Home
+    alias: HOME
+    title: Sales Dashboard
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    security {
+        authentication: public
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region all-transactions (
+        name: All Transactions
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                    SELECT id, region, amount, sale_date
+                    FROM sales ORDER BY sale_date DESC
+                ```
+        }
+        layout {
+            sequence: 30
+            slot: body
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 9663389135127111
+        }
+
+        column AMOUNT (
+            type: plainText
+            heading {
+                heading: Amount
+                alignment: end
+            }
+            layout {
+                sequence: 30
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FML999G999G999G999G990D00
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: C
+            }
+        )
+
+        column ID (
+            type: plainText
+            heading {
+                heading: ID
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: A
+            }
+        )
+
+        column REGION (
+            type: plainText
+            heading {
+                heading: Region
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: B
+            }
+        )
+
+        column SALE_DATE (
+            type: plainText
+            heading {
+                heading: Sale Date
+            }
+            layout {
+                sequence: 40
+            }
+            appearance {
+                formatMask: DD-MON-YYYY
+            }
+            source {
+                dataType: DATE
+            }
+            advanced {
+                endUserAlias: D
+            }
+        )
+
+        page {
+            borderWidth: 0.5
+            borderColor: #666666
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+
+            displayColumn AMOUNT (
+                sequence: 3
+            )
+
+            displayColumn ID (
+                sequence: 1
+            )
+
+            displayColumn REGION (
+                sequence: 2
+            )
+
+            displayColumn SALE_DATE (
+                sequence: 4
+            )
+
+        )
+
+    )
+
+    region hero (
+        name: Sales Dashboard
+        title: Sales Dashboard
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: breadcrumbBar
+        }
+        appearance {
+            template: @/hero
+            templateOptions: #DEFAULT#
+        }
+        image {
+            fileUrl: #APP_FILES#icons/app-icon-512.png
+        }
+    )
+
+    region monthly-summary (
+        name: Monthly Summary
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                    SELECT TO_CHAR(sale_date, 'YYYY-MM') AS month, COUNT(*) AS transactions, SUM(amount) AS revenue, ROUND(AVG(amount), 2) AS avg_ticket
+                    FROM sales GROUP BY TO_CHAR(sale_date, 'YYYY-MM') ORDER BY 1
+                ```
+        }
+        layout {
+            sequence: 15
+            slot: body
+            columnSpan: 6
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 9662179546127110
+        }
+
+        column AVG_TICKET (
+            type: plainText
+            heading {
+                heading: Avg Ticket
+                alignment: end
+            }
+            layout {
+                sequence: 40
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FML999G999G999G999G990D00
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: D
+            }
+        )
+
+        column MONTH (
+            type: plainText
+            heading {
+                heading: Month
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: A
+            }
+        )
+
+        column REVENUE (
+            type: plainText
+            heading {
+                heading: Revenue
+                alignment: end
+            }
+            layout {
+                sequence: 30
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FML999G999G999G999G990D00
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: C
+            }
+        )
+
+        column TRANSACTIONS (
+            type: plainText
+            heading {
+                heading: # Transactions
+                alignment: end
+            }
+            layout {
+                sequence: 20
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: 999G999G990
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: B
+            }
+        )
+
+        page {
+            borderWidth: 0.5
+            borderColor: #666666
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+
+            displayColumn AVG_TICKET (
+                sequence: 4
+            )
+
+            displayColumn MONTH (
+                sequence: 1
+            )
+
+            displayColumn REVENUE (
+                sequence: 3
+            )
+
+            displayColumn TRANSACTIONS (
+                sequence: 2
+            )
+
+        )
+
+    )
+
+    region sales-by-region (
+        name: Sales by Region
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                    SELECT region, COUNT(*) AS transactions, SUM(amount) AS total_sales, ROUND(AVG(amount), 2) AS avg_sale
+                    FROM sales GROUP BY region ORDER BY SUM(amount) DESC
+                ```
+        }
+        layout {
+            sequence: 20
+            slot: body
+            startNewRow: false
+            columnSpan: 6
+        }
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            savedReportMappingIdentifier: 9662770769127110
+        }
+
+        column AVG_SALE (
+            type: plainText
+            heading {
+                heading: Avg Sale
+                alignment: end
+            }
+            layout {
+                sequence: 40
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FML999G999G999G999G990D00
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: D
+            }
+        )
+
+        column REGION (
+            type: plainText
+            heading {
+                heading: Region
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: A
+            }
+        )
+
+        column TOTAL_SALES (
+            type: plainText
+            heading {
+                heading: Total Sales
+                alignment: end
+            }
+            layout {
+                sequence: 30
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FML999G999G999G999G990D00
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: C
+            }
+        )
+
+        column TRANSACTIONS (
+            type: plainText
+            heading {
+                heading: # Transactions
+                alignment: end
+            }
+            layout {
+                sequence: 20
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: 999G999G990
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: B
+            }
+        )
+
+        page {
+            borderWidth: 0.5
+            borderColor: #666666
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+
+            displayColumn AVG_SALE (
+                sequence: 4
+            )
+
+            displayColumn REGION (
+                sequence: 1
+            )
+
+            displayColumn TOTAL_SALES (
+                sequence: 3
+            )
+
+            displayColumn TRANSACTIONS (
+                sequence: 2
+            )
+
+        )
+
+    )
+
+)
+
