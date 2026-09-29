@@ -62,7 +62,7 @@ The bridge:
 - Opens (or reuses) a Terminal.app / iTerm2 tab titled `webinar-demo`
 - Sends each Run-button click to that tab via AppleScript
 
-Slide navigation: `←` / `→`, `Space`, `Home` / `End`, `F` for fullscreen. Click the left or right third of the deck margin to advance. Clicking inside a code block or on a `Run` / `⎘` button doesn't advance the slide.
+Slide navigation: `←` / `→`, `Space`, `Home` / `End`, `F` for fullscreen. `L` (or the ☀/☾ button) toggles light/dark and remembers your choice; `?theme=light` in the URL forces it. Click the left or right third of the deck margin to advance. Clicking inside a code block or on a `Run` / `⎘` button doesn't advance the slide.
 
 ## Give your agent Oracle's own skills
 

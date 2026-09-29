@@ -16,7 +16,32 @@
     --purple: #d2a8ff;
     --panel: #161b22;
     --border: #30363d;
+    --code-bg: #010409;
+    --btn-bg: #21262d;
+    --on-accent: #010409;
   }
+  :root[data-theme="light"] {
+    --bg: #f6f8fa;
+    --fg: #1f2328;
+    --dim: #656d76;
+    --accent: #1a7f37;
+    --amber: #9a6700;
+    --pink: #cf222e;
+    --blue: #0969da;
+    --purple: #8250df;
+    --panel: #ffffff;
+    --border: #d0d7de;
+    --code-bg: #ffffff;
+    --btn-bg: #eaeef2;
+    --on-accent: #ffffff;
+  }
+  :root[data-theme="light"] .logos img.visc { content: url("data:image/png;base64,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"); }
+  :root[data-theme="light"] .logos img.orapub { filter: invert(1); }
+  .theme-btn {
+    background: var(--btn-bg); color: var(--fg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1px 10px; font-family: inherit; font-size: 12px; cursor: pointer; margin-left: 10px; line-height: 1.6;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     height: 100%;
@@ -83,7 +108,7 @@
     letter-spacing: 2px;
   }
   .cmd {
-    background: #010409;
+    background: var(--code-bg);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 18px 22px;
@@ -124,16 +149,16 @@
   .line-btn:hover                     { background: var(--panel); color: var(--fg); }
   .line-btn.run:hover                 { color: var(--accent); border-color: var(--accent); }
   .line-btn.copy:hover                { color: var(--blue);   border-color: var(--blue); }
-  .line-btn.busy                      { background: var(--amber); color: #010409; }
-  .line-btn.ok                        { background: var(--accent); color: #010409; }
-  .line-btn.err                       { background: var(--pink); color: #010409; }
+  .line-btn.busy                      { background: var(--amber); color: var(--on-accent); }
+  .line-btn.ok                        { background: var(--accent); color: var(--on-accent); }
+  .line-btn.err                       { background: var(--pink); color: var(--on-accent); }
   .line-btn:disabled                  { opacity: 0.25; cursor: not-allowed; }
   .why, .prompt-quote, .recap, ul.tight { user-select: text; }
   .run-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #21262d;
+    background: var(--btn-bg);
     color: var(--accent);
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -143,17 +168,17 @@
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
   }
-  .run-btn:hover { background: var(--accent); color: #010409; }
+  .run-btn:hover { background: var(--accent); color: var(--on-accent); }
   .run-btn:active { transform: translateY(1px); }
-  .run-btn.busy { background: var(--amber); color: #010409; cursor: wait; }
-  .run-btn.ok   { background: var(--accent); color: #010409; }
-  .run-btn.err  { background: var(--pink); color: #010409; }
+  .run-btn.busy { background: var(--amber); color: var(--on-accent); cursor: wait; }
+  .run-btn.ok   { background: var(--accent); color: var(--on-accent); }
+  .run-btn.err  { background: var(--pink); color: var(--on-accent); }
   .run-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .bridge-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #21262d;
+    background: var(--btn-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 2px 10px;
@@ -206,7 +231,7 @@
     flex-shrink: 0;
   }
   .footer .keys kbd {
-    background: #21262d;
+    background: var(--btn-bg);
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 2px 8px;
@@ -216,7 +241,7 @@
     margin: 0 2px;
   }
   .prompt-quote {
-    background: #010409;
+    background: var(--code-bg);
     border-left: 4px solid var(--amber);
     border-radius: 4px;
     padding: 20px 24px;
@@ -291,7 +316,7 @@
   }
   .recap .step-t code {
     color: var(--fg);
-    background: #010409;
+    background: var(--code-bg);
     padding: 2px 8px;
     border-radius: 3px;
     border: 1px solid var(--border);
@@ -334,6 +359,7 @@
   <span id="bridge-pill" class="bridge-pill" title="Bridge status">
     <span class="led"></span><span id="bridge-label">checking…</span>
   </span>
+  <button id="theme-toggle" class="theme-btn" title="Toggle light / dark (L)">☀ light</button>
 </div>
 
 <div class="stage" id="stage">
@@ -614,7 +640,7 @@
 
 <div class="footer">
   <div class="keys">
-    <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> next &nbsp;·&nbsp; <kbd>Home</kbd> / <kbd>End</kbd> jump &nbsp;·&nbsp; <kbd>F</kbd> fullscreen
+    <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> next &nbsp;·&nbsp; <kbd>Home</kbd> / <kbd>End</kbd> jump &nbsp;·&nbsp; <kbd>F</kbd> fullscreen &nbsp;·&nbsp; <kbd>L</kbd> theme
   </div>
   <div><span id="counter">1 / 15</span></div>
 </div>
@@ -630,11 +656,26 @@
     counter.textContent = (i + 1) + ' / ' + slides.length;
     history.replaceState(null, '', '#' + (i + 1));
   }
+  // --- theme -------------------------------------------------------------
+  const root = document.documentElement, tbtn = document.getElementById('theme-toggle');
+  function applyTheme(t) {
+    if (t === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
+    tbtn.textContent = t === 'light' ? '☾ dark' : '☀ light';
+    try { localStorage.setItem('deck-theme', t); } catch (e) {}
+  }
+  (function () {
+    const q = new URLSearchParams(location.search).get('theme');
+    let t = q; if (!t) { try { t = localStorage.getItem('deck-theme'); } catch (e) {} }
+    applyTheme(t === 'light' ? 'light' : 'dark');
+  })();
+  tbtn.addEventListener('click', e => { e.stopPropagation(); applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); });
+
   document.addEventListener('keydown', e => {
     if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(i + 1); }
     else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
     else if (e.key === 'Home') { show(0); }
     else if (e.key === 'End')  { show(slides.length - 1); }
+    else if (e.key === 'l' || e.key === 'L') { applyTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light'); }
     else if (e.key === 'f' || e.key === 'F') {
       if (!document.fullscreenElement) document.documentElement.requestFullscreen();
       else document.exitFullscreen();
