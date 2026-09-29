@@ -36,6 +36,6 @@ echo "  Database Actions / SQL Developer Web: ${ORDS}sql-developer"
 echo "    ADMIN   / $(rd .adb-admin-password 07-provision-adb.sh)   (DBA)"
 echo "    WEBINAR / $(rd .webinar-schema-password 08-setup-workspace.sh)   (app schema)"
 echo
-echo "  SQLcl: sql -cloudconfig $HERE/wallet.zip webinar/<schema pw>@webinar_medium"
+echo "  SQLcl: sql -cloudconfig $HERE/wallet.zip webinar/<schema pw>@$(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name" 2>/dev/null || echo webinar)_medium"
 echo "  Wallet password: $(rd .wallet-password 07-provision-adb.sh)"
 echo "=================================================================="

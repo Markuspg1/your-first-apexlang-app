@@ -90,6 +90,10 @@ fi
 
 printf '%s' "$DB_ID" > "$DB_ID_FILE"
 ok "ADB OCID saved to $DB_ID_FILE"
+# Record the actual db-name so 08/09/10 can build the TNS service (<dbname>_medium)
+oci db autonomous-database get --profile "$PROFILE" --region "$REGION" --autonomous-database-id "$DB_ID" \
+  --query 'data."db-name"' --raw-output 2>/dev/null | tr -d '\n' > "$HERE/.adb-db-name"
+ok "db name: $(cat "$HERE/.adb-db-name")  (service: $(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name")_medium)"
 
 # Wallet
 WALLET_PW="Wal$(openssl rand -hex 10)Aa1"

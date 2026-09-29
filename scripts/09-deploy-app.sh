@@ -20,6 +20,7 @@ have sql              || { err "sqlcl not installed"; exit 1; }
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}"
 
 SCHEMA_PW=$(cat "$SCHEMA_PW_FILE")
+SVC="$(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name" 2>/dev/null || echo webinar)_medium"
 DB_ID=$(cat "$DB_ID_FILE")
 PROFILE="${OCI_PROFILE:-personal}"
 REGION=$(oci_region "$PROFILE")
@@ -34,11 +35,11 @@ EOF
 INSTALL_SQL="$PROJECT/supporting-objects/install-scripts/sales-schema.sql"
 if [ -f "$INSTALL_SQL" ]; then
   info "running supporting-objects install script (sales table + seed rows)…"
-  sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@webinar_medium" @"$INSTALL_SQL" 2>&1 | tail -3
+  sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@${SVC}" @"$INSTALL_SQL" 2>&1 | tail -3
 fi
 
 info "importing into WEBINAR workspace as WEBINAR schema…"
-sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@webinar_medium" <<EOF | tail -8
+sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@${SVC}" <<EOF | tail -8
 apex import -input $PROJECT
 SELECT application_id, application_name, alias FROM apex_applications WHERE workspace = 'WEBINAR' ORDER BY application_id DESC FETCH FIRST 3 ROWS ONLY;
 EXIT
@@ -49,7 +50,7 @@ export OCI_CLI_AUTH=security_token
 ORDS=$(oci db autonomous-database get --profile "$PROFILE" --region "$REGION" \
   --autonomous-database-id "$DB_ID" \
   --query 'data."connection-urls"."ords-url"' --raw-output 2>&1)
-ALIAS=$(sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@webinar_medium" <<'EOF' 2>&1 | grep -oE '[a-z][a-z0-9_-]{2,}' | tail -1
+ALIAS=$(sql -cloudconfig "$WALLET" -S "webinar/${SCHEMA_PW}@${SVC}" <<'EOF' 2>&1 | grep -oE '[a-z][a-z0-9_-]{2,}' | tail -1
 SET HEADING OFF FEEDBACK OFF PAGESIZE 0 SQLFORMAT DEFAULT
 SELECT LOWER(alias) FROM apex_applications WHERE workspace = 'WEBINAR' ORDER BY application_id DESC FETCH FIRST 1 ROWS ONLY;
 EXIT

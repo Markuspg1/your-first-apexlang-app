@@ -16,6 +16,7 @@ have sql                || { err "sqlcl not installed — run 03-install-sqlcl.s
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home}"
 
 ADMIN_PW=$(cat "$ADMIN_PW_FILE")
+SVC="$(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name" 2>/dev/null || echo webinar)_medium"
 SCHEMA_PW="Wbn$(openssl rand -hex 10)Aa1"
 WEB_PW="WebAdmin$(openssl rand -hex 8)Aa1"
 printf '%s' "$SCHEMA_PW" > "$SCHEMA_PW_FILE" && chmod 600 "$SCHEMA_PW_FILE"
@@ -80,7 +81,7 @@ EXIT
 SQL
 
 info "running workspace bootstrap as ADMIN…"
-sql -cloudconfig "$WALLET" -S "admin/${ADMIN_PW}@webinar_medium" @"$TMP_SQL"
+sql -cloudconfig "$WALLET" -S "admin/${ADMIN_PW}@${SVC}" @"$TMP_SQL"
 
 ok "workspace ready"
 echo
