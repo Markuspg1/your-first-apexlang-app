@@ -105,6 +105,18 @@ oci db autonomous-database delete --profile personal --region "$OCI_REGION" \
   --autonomous-database-id "$DB_ID" --force --wait-for-state SUCCEEDED
 ```
 
-## Attribution
+## About the author
 
-Marco Pereira · [markuspg.com](https://markuspg.com) · 2026
+**Marco Pereira** — Oracle APEX developer and AI integration expert based in College Station, Texas. Oracle ACE Associate, Kscope speaker, university professor, and consultant on Oracle APEX, E-Business Suite, Fusion, and Autonomous Database at Viscosity North America.
+
+- Website and blog: [markuspg.com](https://markuspg.com) — articles, talks, and the webinar this repo was built for
+- LinkedIn: [linkedin.com/in/marco-pereira-740022122](https://www.linkedin.com/in/marco-pereira-740022122/) — follow for APEX, APEXlang, and AI-agent posts
+- GitHub: [github.com/Markuspg1](https://github.com/Markuspg1) — more demos and tooling
+- Viscosity North America: [viscosityna.com](https://viscosityna.com) — Oracle consulting, the team behind this work
+- OraPub: [orapub.com](https://www.orapub.com) — Oracle performance training and tooling, powered by Viscosity
+
+If this saved you a night of `ORA-00001: unique constraint violated`, star the repo and say hi on LinkedIn. Questions, corrections, and pull requests welcome.
+
+---
+
+Built for the webinar *Your First APEXlang App — From Nothing to Running in a Single Session* · Marco Pereira · 2026
