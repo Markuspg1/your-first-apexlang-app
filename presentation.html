@@ -90,6 +90,25 @@
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0);   }
   }
+  /* PDF export: every slide on its own 16:9 page, interactive chrome hidden.
+     chrome --headless=new --print-to-pdf=deck.pdf --no-pdf-header-footer presentation.html */
+  @media print {
+    @page { size: 1600px 900px; margin: 0; }
+    html, body { height: auto; overflow: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { display: block; }
+    .titlebar, .footer, .theme-btn, .run-btn, .line-actions, #bridge-pill { display: none !important; }
+    .stage { display: block; padding: 0; overflow: visible; }
+    .slide {
+      display: flex !important;
+      width: 1600px; height: 900px;
+      padding: 40px 60px;
+      overflow: hidden;
+      animation: none;
+      break-after: page; page-break-after: always;
+      background: var(--bg);
+    }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+  }
   h1 {
     font-size: 34px;
     color: var(--accent);

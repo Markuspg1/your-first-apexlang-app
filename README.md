@@ -62,6 +62,14 @@ The bridge:
 - Opens (or reuses) a Terminal.app / iTerm2 tab titled `webinar-demo`
 - Sends each Run-button click to that tab via AppleScript
 
+PDF handouts live in [`pdf/`](pdf/) (dark and light). To regenerate after editing the deck:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --no-pdf-header-footer \
+  --print-to-pdf=pdf/your-first-apexlang-app-dark.pdf "file://$PWD/presentation.html"
+# light variant: append ?theme=light to the URL
+```
+
 Slide navigation: `←` / `→`, `Space`, `Home` / `End`, `F` for fullscreen. `L` (or the ☀/☾ button) toggles light/dark and remembers your choice; `?theme=light` in the URL forces it. Click the left or right third of the deck margin to advance. Clicking inside a code block or on a `Run` / `⎘` button doesn't advance the slide.
 
 ## Give your agent Oracle's own skills
