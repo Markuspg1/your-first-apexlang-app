@@ -92,5 +92,35 @@ list navigation-menu (
         }
     )
 
+    entry administration (
+        label: Administration
+        icon {
+            imageIconCssClasses: fa-cogs
+        }
+        layout {
+            sequence: 30
+        }
+        link {
+            target: {
+                page: 3
+            }
+        }
+    )
+
+    entry maintenance (
+        label: Maintenance
+        icon {
+            imageIconCssClasses: fa-wrench
+        }
+        layout {
+            sequence: 40
+        }
+        link {
+            target: {
+                page: 4
+            }
+        }
+    )
+
 )
 

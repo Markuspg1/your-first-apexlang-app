@@ -1,0 +1,443 @@
+page 3 (
+    name: Administration
+    alias: ADMIN
+    title: Administration
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    security {
+        authentication: public
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region hero (
+        name: Administration
+        title: Administration
+        type: staticContent
+        layout {
+            sequence: 5
+            slot: breadcrumbBar
+        }
+        appearance {
+            template: @/hero
+            templateOptions: #DEFAULT#
+        }
+        image {
+            fileUrl: #APP_FILES#icons/app-icon-512.png
+        }
+    )
+
+    region workspace-users (
+        name: Workspace Users
+        type: interactiveReport
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        layout {
+            sequence: 10
+            slot: body
+            columnSpan: 6
+        }
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                SELECT user_name, email, is_admin, is_application_developer, account_locked, date_created, date_last_login FROM apex_workspace_apex_users WHERE workspace_id = (SELECT workspace_id FROM apex_applications WHERE application_id = :APP_ID) ORDER BY user_name
+            ```
+        }
+        column USER_NAME (
+            type: plainText
+            heading {
+                heading: "User"
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column EMAIL (
+            type: plainText
+            heading {
+                heading: "Email"
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column IS_ADMIN (
+            type: plainText
+            heading {
+                heading: "Admin"
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column IS_APPLICATION_DEVELOPER (
+            type: plainText
+            heading {
+                heading: "Developer"
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column ACCOUNT_LOCKED (
+            type: plainText
+            heading {
+                heading: "Locked"
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column DATE_CREATED (
+            type: plainText
+            heading {
+                heading: "Created"
+            }
+            layout {
+                sequence: 60
+            }
+            appearance {
+                formatMask: DD-MON-YYYY
+            }
+            source {
+                dataType: DATE
+            }
+        )
+        column DATE_LAST_LOGIN (
+            type: plainText
+            heading {
+                heading: "Last Login"
+            }
+            layout {
+                sequence: 70
+            }
+            appearance {
+                formatMask: DD-MON-YYYY HH24:MI
+            }
+            source {
+                dataType: DATE
+            }
+        )
+    )
+
+    region applications (
+        name: Applications in this Workspace
+        type: interactiveReport
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        layout {
+            sequence: 20
+            slot: body
+            startNewRow: false
+            columnSpan: 6
+        }
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                SELECT application_id, application_name, alias, authentication_scheme, version, owner FROM apex_applications WHERE workspace = (SELECT workspace FROM apex_applications WHERE application_id = :APP_ID) ORDER BY application_id
+            ```
+        }
+        column APPLICATION_ID (
+            type: plainText
+            heading {
+                heading: "App ID"
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+        )
+        column APPLICATION_NAME (
+            type: plainText
+            heading {
+                heading: "Name"
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column ALIAS (
+            type: plainText
+            heading {
+                heading: "Alias"
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column AUTHENTICATION_SCHEME (
+            type: plainText
+            heading {
+                heading: "Authentication"
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column VERSION (
+            type: plainText
+            heading {
+                heading: "Version"
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column OWNER (
+            type: plainText
+            heading {
+                heading: "Schema"
+            }
+            layout {
+                sequence: 60
+            }
+            source {
+                dataType: STRING
+            }
+        )
+    )
+
+    region app-pages (
+        name: Pages of this Application
+        type: interactiveReport
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        layout {
+            sequence: 30
+            slot: body
+            columnSpan: 6
+        }
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                SELECT page_id, page_name, page_alias, page_mode, page_template, page_requires_authentication FROM apex_application_pages WHERE application_id = :APP_ID ORDER BY page_id
+            ```
+        }
+        column PAGE_ID (
+            type: plainText
+            heading {
+                heading: "Page"
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+        )
+        column PAGE_NAME (
+            type: plainText
+            heading {
+                heading: "Name"
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column PAGE_ALIAS (
+            type: plainText
+            heading {
+                heading: "Alias"
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column PAGE_MODE (
+            type: plainText
+            heading {
+                heading: "Mode"
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column PAGE_TEMPLATE (
+            type: plainText
+            heading {
+                heading: "Template"
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column PAGE_REQUIRES_AUTHENTICATION (
+            type: plainText
+            heading {
+                heading: "Auth Required"
+            }
+            layout {
+                sequence: 60
+            }
+            source {
+                dataType: STRING
+            }
+        )
+    )
+
+    region recent-activity (
+        name: Activity — Last 24 Hours
+        type: interactiveReport
+        appearance {
+            template: @/standard
+            templateOptions: #DEFAULT#
+        }
+        layout {
+            sequence: 40
+            slot: body
+            startNewRow: false
+            columnSpan: 6
+        }
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery: ```sql
+                SELECT view_date, apex_user, page_id, page_name, elapsed_time, ip_address, error_message FROM apex_workspace_activity_log WHERE application_id = :APP_ID AND view_date > SYSDATE - 1 ORDER BY view_date DESC
+            ```
+        }
+        column VIEW_DATE (
+            type: plainText
+            heading {
+                heading: "When"
+            }
+            layout {
+                sequence: 10
+            }
+            appearance {
+                formatMask: DD-MON HH24:MI:SS
+            }
+            source {
+                dataType: DATE
+            }
+        )
+        column APEX_USER (
+            type: plainText
+            heading {
+                heading: "User"
+            }
+            layout {
+                sequence: 20
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column PAGE_ID (
+            type: plainText
+            heading {
+                heading: "Page"
+            }
+            layout {
+                sequence: 30
+            }
+            source {
+                dataType: NUMBER
+            }
+        )
+        column PAGE_NAME (
+            type: plainText
+            heading {
+                heading: "Page Name"
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column ELAPSED_TIME (
+            type: plainText
+            heading {
+                heading: "Seconds"
+                alignment: end
+            }
+            layout {
+                sequence: 50
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: 990D000
+            }
+            source {
+                dataType: NUMBER
+            }
+        )
+        column IP_ADDRESS (
+            type: plainText
+            heading {
+                heading: "IP"
+            }
+            layout {
+                sequence: 60
+            }
+            source {
+                dataType: STRING
+            }
+        )
+        column ERROR_MESSAGE (
+            type: plainText
+            heading {
+                heading: "Error"
+            }
+            layout {
+                sequence: 70
+            }
+            source {
+                dataType: STRING
+            }
+        )
+    )
+)

@@ -268,6 +268,20 @@ region sales-by-region-chart (
 - **Always set `chartLayout { height: 400 }`.** With no height the JET chart renders 0px tall inside the body slot: the page looks completely blank, `apex_workspace_activity_log` shows a clean 0.03s render with no error, and the dictionary rows all look right. This is what "the charts page is empty" means.
 - To confirm a chart really landed, query as the parsing schema: `SELECT region_name, chart_type, chart_height, number_of_series, number_of_axes FROM apex_application_page_charts WHERE application_id=:app AND page_id=:pg;`
 
+### Interactive Grid (editable) — working pattern
+
+Straight from Oracle's `templates/page-examples/interactive-grid/interactive-grid.example.md`, with one correction. Verified live on `projects/sales-dashboard/pages/p00004-maintenance.apx`:
+
+- region `type: interactiveGrid`, `appearance { template: @/standard }`, table-backed source `source { location: localDatabase  type: tableView  tableName: SALES }`, `edit { enabled: true  allowedOperations: [ add update delete ] }`, `toolbar { controls: [...] }`, `pagination { type: page }`.
+- columns: `APEX$ROW_ACTION (type: actionsMenu)`, `APEX$ROW_SELECTOR (type: rowSelector)`, a hidden PK `column ID ( type: hidden  source { databaseColumn: ID  dataType: number  primaryKey: true } )`, then `textField` / `numberField` / `datePicker` columns with `source { databaseColumn: X  dataType: varchar2|number|date }` — **lowercase** data types for IG (IR uses `STRING|NUMBER|DATE`).
+- `savedReport PRIMARY ( visibility: primary  view { default: grid }  displayColumn ( column: @ID  layout { sequence: 1 } ) … )` — anonymous `displayColumn` blocks referencing columns with `@`.
+- a page-level `process save-sales ( type: interactiveGridAutoRowProcessing  editableRegion: @sales-editor  execution { sequence: 10 } )` does the DML.
+- **Correction:** Oracle's example puts `enableUsersTo { sort: false }` on the hidden PK column; the compiler rejects it (`Invalid property: sort`). Drop it.
+
+### Administration pages from the APEX dictionary
+
+Read-only IRs over `apex_workspace_apex_users`, `apex_applications`, `apex_application_pages`, `apex_workspace_activity_log` work fine from the app's parsing schema. Scope them without hard-coding names: `WHERE application_id = :APP_ID`, `WHERE workspace_id = (SELECT workspace_id FROM apex_applications WHERE application_id = :APP_ID)`. Bind variables in region SQL are fine. See `pages/p00003-admin.apx`.
+
 ### Making the app public (no login)
 
 Authentication scheme plugin types accepted by the validator (26.1.2): `oracleApexAccounts, databaseAccounts, ldapDirectory, openDoorCredentials, socialSignIn, oracleAppServerSSO, custom, internalAppExtension, samlSignIn, noAuth, httpHeaderVariable`.
