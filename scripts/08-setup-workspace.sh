@@ -5,6 +5,7 @@ set -u
 . "$(dirname "$0")/_lib.sh"
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
+WS="${APEX_WORKSPACE:-WEBINAR}"
 ADMIN_PW_FILE="$HERE/.adb-admin-password"
 SCHEMA_PW_FILE="$HERE/.webinar-schema-password"
 ADMIN_WEB_PW_FILE="$HERE/.webinar-admin-web-password"
@@ -31,42 +32,42 @@ cat > "$TMP_SQL" <<SQL
 SET SERVEROUTPUT ON
 WHENEVER SQLERROR CONTINUE
 
-PROMPT === drop existing schema WEBINAR (idempotent) ===
+PROMPT === drop existing schema ${WS} (idempotent) ===
 BEGIN
-  EXECUTE IMMEDIATE 'DROP USER WEBINAR CASCADE';
+  EXECUTE IMMEDIATE 'DROP USER ${WS} CASCADE';
 EXCEPTION WHEN OTHERS THEN
   IF SQLCODE != -1918 THEN RAISE; END IF;
 END;
 /
 
-PROMPT === create schema WEBINAR ===
+PROMPT === create schema ${WS} ===
 BEGIN
-  EXECUTE IMMEDIATE 'CREATE USER WEBINAR IDENTIFIED BY "${SCHEMA_PW}" QUOTA UNLIMITED ON DATA';
-  EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE, CREATE VIEW, CREATE TABLE, CREATE SEQUENCE, CREATE PROCEDURE, CREATE TRIGGER, CREATE SESSION TO WEBINAR';
-  DBMS_OUTPUT.PUT_LINE('schema WEBINAR created');
+  EXECUTE IMMEDIATE 'CREATE USER ${WS} IDENTIFIED BY "${SCHEMA_PW}" QUOTA UNLIMITED ON DATA';
+  EXECUTE IMMEDIATE 'GRANT CONNECT, RESOURCE, CREATE VIEW, CREATE TABLE, CREATE SEQUENCE, CREATE PROCEDURE, CREATE TRIGGER, CREATE SESSION TO ${WS}';
+  DBMS_OUTPUT.PUT_LINE('schema ${WS} created');
 END;
 /
 
-PROMPT === remove any existing WEBINAR workspace ===
+PROMPT === remove any existing ${WS} workspace ===
 BEGIN
-  APEX_INSTANCE_ADMIN.REMOVE_WORKSPACE(p_workspace => 'WEBINAR', p_drop_users => 'Y', p_drop_tables => 'Y');
+  APEX_INSTANCE_ADMIN.REMOVE_WORKSPACE(p_workspace => '${WS}', p_drop_users => 'Y', p_drop_tables => 'Y');
   DBMS_OUTPUT.PUT_LINE('existing workspace removed');
 EXCEPTION WHEN OTHERS THEN
   DBMS_OUTPUT.PUT_LINE('no existing workspace to remove (' || SQLCODE || ')');
 END;
 /
 
-PROMPT === add workspace WEBINAR bound to schema WEBINAR ===
+PROMPT === add workspace ${WS} bound to schema ${WS} ===
 BEGIN
-  APEX_INSTANCE_ADMIN.ADD_WORKSPACE(p_workspace_id => NULL, p_workspace => 'WEBINAR', p_primary_schema => 'WEBINAR');
-  DBMS_OUTPUT.PUT_LINE('workspace WEBINAR added');
+  APEX_INSTANCE_ADMIN.ADD_WORKSPACE(p_workspace_id => NULL, p_workspace => '${WS}', p_primary_schema => '${WS}');
+  DBMS_OUTPUT.PUT_LINE('workspace ${WS} added');
 END;
 /
 
 PROMPT === create workspace admin user 'admin' ===
 DECLARE v_web_pw VARCHAR2(200) := '${WEB_PW}';
 BEGIN
-  APEX_UTIL.SET_WORKSPACE(p_workspace => 'WEBINAR');
+  APEX_UTIL.SET_WORKSPACE(p_workspace => '${WS}');
   EXECUTE IMMEDIATE 'BEGIN APEX_UTIL.CREATE_USER(p_user_name=>''ADMIN'', p_email_address=>''admin@webinar.local'', p_web_password=>:1, p_developer_privs=>''ADMIN:CREATE:DATA_LOADER:EDIT:HELP:MONITOR:SQL'', p_change_password_on_first_use=>''N''); END;' USING v_web_pw;
   COMMIT;
   DBMS_OUTPUT.PUT_LINE('workspace admin ADMIN created');
@@ -74,13 +75,13 @@ END;
 /
 
 PROMPT === verify ===
-SELECT workspace_id, workspace FROM apex_workspaces WHERE workspace = 'WEBINAR';
-SELECT username FROM dba_users WHERE username = 'WEBINAR';
+SELECT workspace_id, workspace FROM apex_workspaces WHERE workspace = '${WS}';
+SELECT username FROM dba_users WHERE username = '${WS}';
 
 EXIT
 SQL
 
-info "running workspace bootstrap as ADMIN…"
+info "running workspace bootstrap as ADMIN (workspace/schema ${WS})…"
 sql -cloudconfig "$WALLET" -S "admin/${ADMIN_PW}@${SVC}" @"$TMP_SQL"
 
 ok "workspace ready"

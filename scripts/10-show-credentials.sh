@@ -7,6 +7,7 @@ set -u
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 PROFILE="${OCI_PROFILE:-personal}"
+WS="${APEX_WORKSPACE:-WEBINAR}"; WS_LC=$(printf "%s" "$WS" | tr "A-Z" "a-z")
 export OCI_CLI_AUTH=security_token
 
 rd() { [ -f "$HERE/$1" ] && cat "$HERE/$1" || printf '(not yet — run %s)' "$2"; }
@@ -24,18 +25,18 @@ echo "=================================================================="
 echo "  APEX BUILDER LOGIN  — open the app in App Builder / Page Designer"
 echo "=================================================================="
 echo "  URL       : ${ORDS}apex/"
-echo "  Workspace : WEBINAR"
+echo "  Workspace : $WS"
 echo "  Username  : ADMIN"
 echo "  Password  : $(rd .webinar-admin-web-password 08-setup-workspace.sh)"
 echo
 echo "  Deployed app (public, no login):"
-echo "    ${ORDS}r/webinar/sales-dashboard/"
+echo "    ${ORDS}r/${WS_LC}/sales-dashboard/"
 echo "    (alias gets a numeric suffix, e.g. sales-dashboard102, if you import more than once)"
 echo
 echo "  Database Actions / SQL Developer Web: ${ORDS}sql-developer"
 echo "    ADMIN   / $(rd .adb-admin-password 07-provision-adb.sh)   (DBA)"
-echo "    WEBINAR / $(rd .webinar-schema-password 08-setup-workspace.sh)   (app schema)"
+echo "    $WS / $(rd .webinar-schema-password 08-setup-workspace.sh)   (app schema)"
 echo
-echo "  SQLcl: sql -cloudconfig $HERE/wallet.zip webinar/<schema pw>@$(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name" 2>/dev/null || echo webinar)_medium"
+echo "  SQLcl: sql -cloudconfig $HERE/wallet.zip ${WS_LC}/<schema pw>@$(tr 'A-Z' 'a-z' < "$HERE/.adb-db-name" 2>/dev/null || echo webinar)_medium"
 echo "  Wallet password: $(rd .wallet-password 07-provision-adb.sh)"
 echo "=================================================================="
